@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
-import { InvalidateCacheProps } from "../types/types.js";
+import { InvalidateCacheProps, OrderItemType } from "../types/types.js";
 import { Product } from "../models/product.js";
 import { myCache } from "../app.js";
-export const dbConnect = () =>{
-    mongoose.connect('mongodb://127.0.0.1:27017/ecommerce24',{
+import { error } from "console";
+export const dbConnect = (url:string) =>{
+    mongoose.connect(url,{
         // useNewUrlParser:true,
         // useUnifiedTopology:true,
     })
@@ -37,3 +38,23 @@ export const invalidateCache = async({
     }
 
   };
+
+
+  export const reduceStock =  async(orderItem:OrderItemType[])=>{
+
+    for (let i = 0; i < orderItem.length; i++) {
+
+      const order = orderItem[i];
+
+      const product = await Product.findById(order.productId);
+
+      if(!product) throw new Error ("Product Not Found")
+
+      product.stock -= order.quantity;
+
+      await product.save();
+
+      
+    }
+
+  }
