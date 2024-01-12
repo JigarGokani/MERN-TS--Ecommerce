@@ -1,5 +1,6 @@
 import express from "express"
 import userRoute from "./routes/user.js"
+import productRoute from "./routes/products.js"
 import {dbConnect} from './utils/features.js'
 import { errorMiddleware } from "./middlewares/error.js";
 const app = express();
@@ -11,6 +12,7 @@ dbConnect();
 
 // Mounting Routes
 app.use("/api/v1/user",userRoute);
+app.use("/api/v1/product",productRoute);
 
 
 app.get("/",(req,res)=>{
@@ -20,7 +22,7 @@ app.get("/",(req,res)=>{
 
 
 
-
+app.use("/uploads",express.static("uploads"))
 app.use(errorMiddleware);
 app.listen(port,()=>{
     console.log(`App listening at the port ${port}`)
