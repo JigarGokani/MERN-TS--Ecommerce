@@ -2,6 +2,7 @@ import { TryCatch } from "../middlewares/error.js";
 import { Product } from "../models/product.js";
 import ErrorHandler from "../utils/utility-class.js";
 import { rm } from "fs";
+import { myCache } from "../app.js";
 // import { faker } from "@faker-js/faker";
 export const newProduct = TryCatch(async (req, res, next) => {
     const { name, category, price, stock } = req.body;
@@ -27,32 +28,61 @@ export const newProduct = TryCatch(async (req, res, next) => {
         message: "Product Created successfully!"
     });
 });
+// Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 
 export const getLatestProduct = TryCatch(async (req, res, next) => {
-    const product = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+    let products;
+    if (myCache.has("latest-products"))
+        products = JSON.parse(myCache.get("latest-products"));
+    else {
+        products = await Product.find({}).sort({ createdAt: -1 }).limit(5);
+        // yaha par db se products milne ke baad hum humare cache-memory me store karege jisse dusri baar user ke request marne par hum direct cache memory mese hi data dedenge (fast processing)
+        myCache.set("latest-products", JSON.stringify(products));
+    }
     res.status(200).json({
         success: true,
-        product
+        products
     });
 });
+// Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 
 export const getAllCategories = TryCatch(async (req, res, next) => {
-    const Categories = await Product.distinct("category");
+    let Categories;
+    if (myCache.has("categories"))
+        Categories = JSON.parse(myCache.get("categories"));
+    else {
+        Categories = await Product.distinct("category");
+        myCache.set("categories", JSON.stringify(Categories));
+    }
     res.status(200).json({
         success: true,
         Categories
     });
 });
+// Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 
 export const getAdminProducts = TryCatch(async (req, res, next) => {
-    const product = await Product.find({});
+    let products;
+    if (myCache.has("all-products"))
+        products = JSON.parse(myCache.get("all-products"));
+    else {
+        products = await Product.find({});
+        myCache.set("all-products", JSON.stringify(products));
+    }
     res.status(200).json({
         success: true,
-        product
+        products
     });
 });
+// Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 
 export const getSingleProduct = TryCatch(async (req, res, next) => {
+    let product;
     const id = req.params.id;
-    const product = await Product.findById(id);
-    if (!product)
-        return next(new ErrorHandler("Invalid Product ID", 404));
+    if (myCache.has(`product-${id}`))
+        product = JSON.parse(myCache.get(`product-${id}`));
+    else {
+        product = await Product.findById(id);
+        if (!product)
+            return next(new ErrorHandler("Invalid Product ID", 404));
+        myCache.set(`product-${id}`, JSON.stringify(product));
+    }
     res.status(200).json({
         success: true,
         product
