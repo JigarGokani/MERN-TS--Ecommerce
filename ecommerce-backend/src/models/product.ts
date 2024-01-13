@@ -1,4 +1,6 @@
-import mongoose from "mongoose";
+import mongoose,{ObjectId} from "mongoose";
+
+
 
 const prodschema = new mongoose.Schema(
   {

@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from "express";
+import {ObjectId } from 'mongoose';
+
 
 export interface NewUserRequestBody {
     name: string;
@@ -16,6 +18,7 @@ export interface NewUserRequestBody {
   ) => Promise<void | Response<any, Record<string, any>>>;
 
   export interface NewProductRequestBody {
+    _id: ObjectId;
     name: string;
     category: string;
     price:number;
@@ -48,6 +51,10 @@ export interface NewUserRequestBody {
     product?: boolean;
     order?: boolean;
     admin?: boolean;
+    userId?: string;
+    orderId?: string;
+    productId?: string | string[];
+
   };
 
 
