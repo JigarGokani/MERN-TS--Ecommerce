@@ -3,7 +3,7 @@ import { TryCatch } from "../middlewares/error.js";
 import { Order } from "../models/order.js";
 import { Product } from "../models/product.js";
 import { User } from "../models/user.js";
-import { calculatePercentage } from "../utils/features.js";
+import { calculatePercentage, getInventories } from "../utils/features.js";
 export const getDashboardStats = TryCatch(async (req, res, next) => {
     let stats = {};
     if (myCache.has("admin-stats"))
@@ -62,7 +62,10 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
                 $lte: today,
             },
         });
-        const [thisMonthProducts, thisMonthUsers, thisMonthOrders, lastMonthProducts, lastMonthUsers, lastMonthOrders, productsCount, usersCount, allOrders, lastSixMonthOrders,] = await Promise.all([
+        const latestTransactionsPromise = Order.find({})
+            .select(["orderItems", "discount", "total", "status"])
+            .limit(4);
+        const [thisMonthProducts, thisMonthUsers, thisMonthOrders, lastMonthProducts, lastMonthUsers, lastMonthOrders, productsCount, usersCount, allOrders, lastSixMonthOrders, categories, femaleUsersCount, latestTransaction,] = await Promise.all([
             thisMonthProductPromise,
             thisMonthUsersPromise,
             thisMonthOrdersPromise,
@@ -73,6 +76,9 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
             User.countDocuments(),
             Order.find({}).select("total"),
             lastSixMonthOrdersPromise,
+            Product.distinct("category"),
+            User.countDocuments({ gender: "female" }),
+            latestTransactionsPromise,
         ]);
         const thisMonthRevenue = thisMonthOrders.reduce((total, order) => total + (order.total || 0), 0);
         const lastMonthRevenue = lastMonthOrders.reduce((total, order) => total + (order.total || 0), 0);
@@ -99,14 +105,33 @@ export const getDashboardStats = TryCatch(async (req, res, next) => {
                 orderMonthyRevenue[6 - monthDiff - 1] += order.total;
             }
         });
+        const categoryCount = await getInventories({
+            categories,
+            productsCount,
+        });
+        const userRatio = {
+            male: usersCount - femaleUsersCount,
+            female: femaleUsersCount,
+        };
+        const modifiedLatestTransaction = latestTransaction.map((i) => ({
+            _id: i._id,
+            discount: i.discount,
+            amount: i.total,
+            quantity: i.orderItems.length,
+            status: i.status,
+        }));
         stats = {
+            categoryCount,
             changePercent,
             count,
             chart: {
                 order: orderMonthCounts,
                 revenue: orderMonthyRevenue,
             },
+            userRatio,
+            latestTransaction: modifiedLatestTransaction,
         };
+        myCache.set("admin-stats", JSON.stringify(stats));
     }
     return res.status(200).json({
         success: true,
