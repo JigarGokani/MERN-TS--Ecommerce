@@ -18,7 +18,7 @@ export const dbConnect = (url:string) =>{
 }
 
 
-export const invalidateCache = async({
+export const invalidateCache = ({
     product,
     order,
     admin,
@@ -45,6 +45,14 @@ export const invalidateCache = async({
       const ordersKeys:string[] = ["all-orders",`my-orders-${userId}`,`order-${orderId}`]
 
       myCache.del(ordersKeys);
+    }
+    if (admin) {
+      myCache.del([
+        "admin-stats",
+        "admin-pie-charts",
+        "admin-bar-charts",
+        "admin-line-charts",
+      ]);
     }
 
   };

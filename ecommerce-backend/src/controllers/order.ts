@@ -7,6 +7,7 @@ import { invalidateCache, reduceStock } from "../utils/features.js";
 import { myCache } from "../app.js";
 
 export const newOrder = TryCatch(async(
+
     req:Request<{},{},NewOrderRequestBody>,
     res:Response,
     next:NextFunction
@@ -39,7 +40,7 @@ export const newOrder = TryCatch(async(
 
       await reduceStock(orderItems);
 
-      await invalidateCache({
+      invalidateCache({
         product:true, 
         order:true,
         admin:true,

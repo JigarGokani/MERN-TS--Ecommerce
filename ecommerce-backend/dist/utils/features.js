@@ -13,7 +13,7 @@ export const dbConnect = (url) => {
         process.exit(1);
     });
 };
-export const invalidateCache = async ({ product, order, admin, userId, orderId, productId, }) => {
+export const invalidateCache = ({ product, order, admin, userId, orderId, productId, }) => {
     if (product) {
         const productKeys = [
             "latest-products",
@@ -29,6 +29,14 @@ export const invalidateCache = async ({ product, order, admin, userId, orderId, 
     if (order) {
         const ordersKeys = ["all-orders", `my-orders-${userId}`, `order-${orderId}`];
         myCache.del(ordersKeys);
+    }
+    if (admin) {
+        myCache.del([
+            "admin-stats",
+            "admin-pie-charts",
+            "admin-bar-charts",
+            "admin-line-charts",
+        ]);
     }
 };
 export const reduceStock = async (orderItem) => {

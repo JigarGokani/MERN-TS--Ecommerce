@@ -9,6 +9,7 @@ import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
 import { config } from "dotenv";
 import morgan from "morgan";
+import Stripe from "stripe";
 config({
     path: "./.env"
 });
@@ -17,7 +18,9 @@ app.use(express.json());
 app.use(morgan("dev"));
 const port = process.env.PORT || 6000;
 const mongoURL = process.env.MONGO_URL || "";
+const stripeKey = process.env.STRIPE_KEY || "";
 dbConnect(mongoURL);
+export const stripe = new Stripe(stripeKey);
 export const myCache = new NodeCache();
 // Mounting Routes
 app.use("/api/v1/user", userRoute);
