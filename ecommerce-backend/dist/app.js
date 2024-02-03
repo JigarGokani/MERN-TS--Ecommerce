@@ -10,12 +10,14 @@ import NodeCache from "node-cache";
 import { config } from "dotenv";
 import morgan from "morgan";
 import Stripe from "stripe";
+import cors from "cors";
 config({
     path: "./.env"
 });
 const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cors());
 const port = process.env.PORT || 6000;
 const mongoURL = process.env.MONGO_URL || "";
 const stripeKey = process.env.STRIPE_KEY || "";
