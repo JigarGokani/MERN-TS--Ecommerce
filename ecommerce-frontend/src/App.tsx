@@ -6,7 +6,7 @@ import {Toaster} from "react-hot-toast"
 import { useDispatch, useSelector } from "react-redux"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "./firebase"
-import { userExist, userNotExist } from "./redux/reducer/useReducer"
+import { userExist, userNotExist } from "./redux/reducer/userReducer"
 import { getUser } from "./redux/api/userAPI"
 import { UserReducerInitialState } from "./types/reducer-types"
 import ProtectedRoute from "./components/protected-route"
@@ -80,7 +80,7 @@ const App = () => {
 
 
       {/* Not Login case only*/}
-      <Route path="/login" element={<ProtectedRoute isAuthenticated={user?true:false}>
+      <Route path="/login" element={<ProtectedRoute isAuthenticated={user?false:true}>
         <Login/>
       </ProtectedRoute>}/>
 

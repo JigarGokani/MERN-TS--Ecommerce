@@ -1,6 +1,6 @@
 import {configureStore} from "@reduxjs/toolkit"
 import { userAPI } from "./api/userAPI";
-import { userReducer } from "./reducer/useReducer";
+import { userReducer } from "./reducer/userReducer";
 
 
 export const server = import.meta.env.VITE_SERVER;
