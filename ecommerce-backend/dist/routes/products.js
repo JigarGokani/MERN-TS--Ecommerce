@@ -6,7 +6,7 @@ const app = express.Router();
 app.post("/new", isAdmin, singleUpload, newProduct);
 app.get("/latest", getLatestProduct);
 app.get("/searchall", filteredData);
-app.get("/category", getAllCategories);
+app.get("/categories", getAllCategories);
 app.get("/admin-products", isAdmin, getAdminProducts);
 app.get("/:id", getSingleProduct);
 app.put("/:id", isAdmin, singleUpload, updateProduct);

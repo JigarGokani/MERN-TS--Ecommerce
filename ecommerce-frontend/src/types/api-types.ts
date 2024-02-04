@@ -29,5 +29,5 @@ export type MessageResponse = {
 
   export type CategoriesResponse = {
     success: boolean;
-    categories: string[];
+    Categories: string[];
   };

@@ -12,7 +12,7 @@ app.get("/latest",getLatestProduct)
 
 app.get("/searchall",filteredData)
 
-app.get("/category",getAllCategories)
+app.get("/categories",getAllCategories)
 
 app.get("/admin-products",isAdmin,getAdminProducts)
 
