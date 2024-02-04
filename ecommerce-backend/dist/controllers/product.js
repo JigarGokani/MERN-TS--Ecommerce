@@ -1,34 +1,55 @@
-import { TryCatch } from "../middlewares/error.js";
-import { Product } from "../models/product.js";
-import ErrorHandler from "../utils/utility-class.js";
-import { rm } from "fs";
-import { myCache } from "../app.js";
-import { invalidateCache } from "../utils/features.js";
-// import { faker } from "@faker-js/faker";
+import { v2 as cloudinary } from 'cloudinary';
+import { TryCatch } from '../middlewares/error.js';
+import { Product } from '../models/product.js';
+import ErrorHandler from '../utils/utility-class.js';
+import { rm } from 'fs';
+import { myCache } from '../app.js';
+import { invalidateCache } from '../utils/features.js';
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
+});
 export const newProduct = TryCatch(async (req, res, next) => {
     const { name, category, price, stock } = req.body;
     const photo = req.file;
     if (!photo)
-        return next(new ErrorHandler("Please add the photo", 400));
+        return next(new ErrorHandler('Please add the photo', 400));
     if (!name || !category || !price || !stock) {
         rm(photo.path, () => {
-            console.log("Deleted");
+            console.log('Deleted');
         });
-        return next(new ErrorHandler("Please enter all the feilds", 400));
+        return next(new ErrorHandler('Please enter all the fields', 400));
     }
-    const product = await Product.create({
-        name,
-        price,
-        stock,
-        category: category.toLowerCase(),
-        photo: photo?.path,
-    });
-    invalidateCache({ product: true, admin: true });
-    res.status(201).json({
-        success: true,
-        product,
-        message: "Product Created successfully!"
-    });
+    try {
+        // Upload image to Cloudinary
+        const cloudinaryResponse = await cloudinary.uploader.upload(photo.path, { folder: "CodeHelp" });
+        // Create product with Cloudinary secure URL
+        const product = await Product.create({
+            name,
+            price,
+            stock,
+            category: category.toLowerCase(),
+            photo: cloudinaryResponse.secure_url,
+        });
+        // Invalidate cache
+        invalidateCache({ product: true, admin: true });
+        res.status(201).json({
+            success: true,
+            product,
+            message: 'Product Created successfully!',
+        });
+    }
+    catch (error) {
+        console.error('Error creating product:', error);
+        return next(new ErrorHandler('Internal Server Error', 500));
+    }
+    finally {
+        // Delete the local file after it's successfully uploaded to Cloudinary
+        rm(photo.path, () => {
+            console.log('Local file deleted');
+        });
+    }
 });
 // Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 
 export const getLatestProduct = TryCatch(async (req, res, next) => {

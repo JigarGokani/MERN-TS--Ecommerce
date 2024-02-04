@@ -5,16 +5,19 @@ import orderRoute from "./routes/order.js";
 import paymentRoute from "./routes/payment.js";
 import dashboardRoute from "./routes/stats.js";
 import { dbConnect } from './utils/features.js';
+import cloudinaryConnect from "./config/cloudinary.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import NodeCache from "node-cache";
 import { config } from "dotenv";
 import morgan from "morgan";
 import Stripe from "stripe";
 import cors from "cors";
+// Import cloudinaryConnect
 config({
     path: "./.env"
 });
 const app = express();
+// Call cloudinaryConnect to set up Cloudinary
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cors());
@@ -22,6 +25,7 @@ const port = process.env.PORT || 6000;
 const mongoURL = process.env.MONGO_URL || "";
 const stripeKey = process.env.STRIPE_KEY || "";
 dbConnect(mongoURL);
+cloudinaryConnect();
 export const stripe = new Stripe(stripeKey);
 export const myCache = new NodeCache();
 // Mounting Routes
