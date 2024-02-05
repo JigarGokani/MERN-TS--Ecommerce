@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import ProductCard from '../components/Product-card'
-import { useCategoriesQuery } from '../redux/api/productAPI'
+import { useCategoriesQuery, useSearchProductsQuery } from '../redux/api/productAPI'
 import { CustomError } from '../types/api-types';
 import toast from 'react-hot-toast';
+import { Skeleton } from '../components/Loader';
 
 const Search = () => {
 
@@ -13,6 +14,20 @@ const Search = () => {
   const[maxPrice,setMaxPrice] = useState(100000)
   const[category,setCategory] = useState("")
   const[page,setPage] = useState(1)
+
+  const {
+    isLoading: productLoading,
+    data: searchedData,
+    isError: productIsError,
+    error: productError,
+  } = useSearchProductsQuery({
+    search,
+    sort,
+    category,
+    page,
+    price: maxPrice,
+  });
+
 
 
   const addToCart=()=>{
@@ -76,20 +91,43 @@ const Search = () => {
         onChange={(e)=>setSearch(e.target.value)}
         />
 
-        <ProductCard
-        productid='jigar' 
-        name="macbook"
-        price = {20000} 
-        stock={4000} 
-        handler={addToCart} 
-        photo='https://m.media-amazon.com/images/I/71vFKBpKakL._SL1500_.jpg'
-        />
+{productLoading ? (
+          <Skeleton length={10} />
+        ) : (
+          <div className="search-product-list">
+            {searchedData?.products.map((i) => (
+              <ProductCard
+                key={i._id}
+                productid={i._id}
+                name={i.name}
+                price={i.price}
+                stock={i.stock}
+                handler={addToCart}
+                photo={i.photo}
+              />
+            ))}
+          </div>
+        )}
 
-        <article>
-          <button disabled ={!isPrevPage} onClick={()=>setPage((prev)=>prev-1)}>Prev</button>
-          <span>{page} of {4}</span>
-          <button disabled={!isNextPage} onClick={()=>setPage((prev)=>prev+1)}>Next</button>
-        </article>
+{searchedData && searchedData.totalPage > 1 && (
+          <article>
+            <button
+              disabled={!isPrevPage}
+              onClick={() => setPage((prev) => prev - 1)}
+            >
+              Prev
+            </button>
+            <span>
+              {page} of {searchedData.totalPage}
+            </span>
+            <button
+              disabled={!isNextPage}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              Next
+            </button>
+          </article>
+        )}
       </main>
     </div>
   )
