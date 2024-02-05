@@ -158,45 +158,53 @@ export const getSingleProduct = TryCatch(async(req,res,next)=>{
 })
 
 
-export const updateProduct = TryCatch(async(req,res,next)=>{
+export const updateProduct = TryCatch(async (req, res, next) => {
+    const id = req.params.id;
+    const { name, category, price, stock } = req.body;
+    const photo = req.file;
 
-        const id = req.params.id;
-        const {name,category,price,stock} =req.body;
-        const photo = req.file;
+    const product = await Product.findById(id);
 
+    if (!product) return next(new ErrorHandler("Invalid Product ID", 404));
 
-        const product = await Product.findById(id);
-
-        if(!product) return next(new ErrorHandler("Invalid Product ID",404))
-
-
-        if(photo) 
-        {
-            rm(product.photo!,()=>{
-                console.log("Old Photo Deleted");
-            });
-            product.photo = photo.path;
+    try {
+        if (photo) {
+            // If there is a new photo, upload it to Cloudinary
+            const cloudinaryResponse = await cloudinary.uploader.upload(photo.path, { folder: "CodeHelp" });
+            
+            // Update product with the new Cloudinary secure URL
+            product.photo = cloudinaryResponse.secure_url; // Semicolon added here
         }
 
-
-       if(name) product.name = name;
-       if(price) product.price = price;
-       if(stock) product.stock = stock;
-       if(category) product.category = category;
-
+        // Update other fields if provided
+        if (name) product.name = name;
+        if (price) product.price = price;
+        if (stock) product.stock = stock;
+        if (category) product.category = category;
 
         await product.save();
 
-        invalidateCache({product:true,admin:true,productId: String(product._id)});
-
+        // Invalidate cache
+        invalidateCache({ product: true, admin: true, productId: String(product._id) });
 
         res.status(201).json({
-            success:true,
-            message:"Product Updated successfully!"
-        })
+            success: true,
+            message: "Product Updated successfully!",
+        });
+    } catch (error) {
+        console.error("Error updating product:", error);
+        return next(new ErrorHandler("Internal Server Error", 500));
+    } finally {
+        // Delete the local file after it's successfully uploaded to Cloudinary
+        if (photo) {
+            rm(photo.path, () => {
+                console.log("Local file deleted");
+            });
+        }
+    }
+});
 
 
-})
 
 
 export const deleteProduct = TryCatch(async(req,res,next)=>{
