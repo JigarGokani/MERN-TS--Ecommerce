@@ -1,10 +1,10 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
 import { useSelector } from "react-redux";
-import { RootState } from "@reduxjs/toolkit/query";
 import { useNewProductMutation } from "../../../redux/api/productAPI";
 import { responseToast } from "../../../utils/features";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../../../redux/store";
 
 const NewProduct = () => {
   const { user } = useSelector((state: RootState) => state.userReducer);

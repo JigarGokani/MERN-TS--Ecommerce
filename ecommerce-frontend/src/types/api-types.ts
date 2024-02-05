@@ -47,3 +47,18 @@ export type MessageResponse = {
     id: string;
     formData: FormData;
   };
+  export type ProductResponse = {
+    success: boolean;
+    product: Product;
+  };
+
+  export type UpdateProductRequest = {
+    userId: string;
+    productId: string;
+    formData: FormData;
+  };
+
+  export type DeleteProductRequest = {
+    userId: string;
+    productId: string;
+  };
