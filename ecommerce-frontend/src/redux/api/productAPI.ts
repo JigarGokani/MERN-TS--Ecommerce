@@ -1,5 +1,5 @@
 import {fetchBaseQuery,createApi} from "@reduxjs/toolkit/query/react"
-import { AllProductsResponse, CategoriesResponse, SearchProductsRequest, SearchProductsResponse } from "../../types/api-types"
+import { AllProductsResponse, CategoriesResponse, MessageResponse, NewProductRequest, SearchProductsRequest, SearchProductsResponse } from "../../types/api-types"
 
 export const productAPI = createApi({
     reducerPath: "productApi",
@@ -35,8 +35,16 @@ export const productAPI = createApi({
       },
       providesTags: ["product"],
     }),
+    newProduct: builder.mutation<MessageResponse, NewProductRequest>({
+      query: ({ formData, id }) => ({
+        url: `new?id=${id}`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["product"],
+    }),
     })
 })
 
 
-export const {useLatestProductsQuery,useAllProductsQuery,useCategoriesQuery,useSearchProductsQuery} = productAPI
+export const {useLatestProductsQuery,useAllProductsQuery,useCategoriesQuery,useSearchProductsQuery,useNewProductMutation} = productAPI
