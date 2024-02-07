@@ -1,31 +1,36 @@
 import { useEffect, useState } from "react";
 import {VscError} from "react-icons/vsc"
-import CartItem from "../components/cart-item";
+import CartItemCard from "../components/cart-item";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { addToCart, calculatePrice, removeCartItem } from "../redux/reducer/cartReducer";
+import { CartItem } from "../types/types";
 
-const cartItem = [
-  {
-    productId:"ndfuhbve",
-    photo:'https://m.media-amazon.com/images/I/71vFKBpKakL._SL1500_.jpg',
-    name:'Macbook',
-    price:3000,
-    quantity:4,
-    stock:10,
-
-  }
-];
-const subtotal = 4000;
-const tax = Math.round(subtotal * 0.18) ;
-const shippingCharges  = 200;
-const discount = 400;
-const total = subtotal + tax + shippingCharges;
 
 
 const Cart = () => {
 
+  const { cartItems, subtotal, tax, total, shippingCharges, discount } =
+    useSelector((state: RootState) => state.cartReducer);
+  const dispatch = useDispatch();
+
   const[couponCode,setCouponCode] = useState<string>("");
   const[isValidCouponCode,setIsValidCouponCode] = useState<boolean>(false);
 
+  const incrementHandler = (cartItem: CartItem) => {
+    if (cartItem.quantity >= cartItem.stock) return;
+
+    dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity + 1 }));
+  };
+  const decrementHandler = (cartItem: CartItem) => {
+    if (cartItem.quantity <= 1) return;
+
+    dispatch(addToCart({ ...cartItem, quantity: cartItem.quantity - 1 }));
+  };
+  const removeHandler = (productId: string) => {
+    dispatch(removeCartItem(productId));
+  };
 
   useEffect(()=>{
 
@@ -43,12 +48,17 @@ const Cart = () => {
 
 
 
+  useEffect(()=>{
+
+    dispatch(calculatePrice())
+
+  },[cartItems])
 
   return (
     <div className="cart">
       <main>
-        { cartItem.length > 0 ?  cartItem.map((i,idx)=>(
-            <CartItem key={idx} cartItem={i}/>
+        { cartItems.length > 0 ?  cartItems.map((i,idx)=>(
+            <CartItemCard key={idx} cartItem={i} incrementHandler={incrementHandler} decrementHandler={decrementHandler} removeHandler={removeHandler}/>
           )) : <h1>No Items In Cart</h1>
          
         }
@@ -82,9 +92,9 @@ const Cart = () => {
             ))
         }
 
-        {
-          cartItem.length > 0 && <Link to="/shipping">Checkout</Link>
-        }
+        {/* {
+          cartItemCard.length > 0 && <Link to="/shipping">Checkout</Link>
+        } */}
 
       </aside>
     </div>

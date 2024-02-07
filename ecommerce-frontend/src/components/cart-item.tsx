@@ -1,12 +1,16 @@
 import React from 'react'
 import { FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { CartItem } from '../types/types';
 
-type CartItemProps ={
-  cartItem:any;
+type CartItemProps = {
+  cartItem: CartItem;
+  incrementHandler: (cartItem: CartItem) => void;
+  decrementHandler: (cartItem: CartItem) => void;
+  removeHandler: (id: string) => void;
 };
 
-const CartItem = ({cartItem}:CartItemProps) => {
+const CartItem = ({cartItem,incrementHandler,decrementHandler,removeHandler}:CartItemProps) => {
   const {photo,productId,name,price,quantity,stock} = cartItem;
 
   return (
@@ -18,12 +22,12 @@ const CartItem = ({cartItem}:CartItemProps) => {
       </article>
 
       <div>
-        <button>-</button>
+        <button onClick={()=>decrementHandler(cartItem)}>-</button>
         <p>{quantity}</p>
-        <button>+</button>
+        <button onClick={()=>incrementHandler(cartItem)}>+</button>
       </div>
 
-      <button>
+      <button onClick={()=>removeHandler(productId)}>
         <FaTrash/>
       </button>
     </div>
