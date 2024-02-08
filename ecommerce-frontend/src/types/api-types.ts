@@ -95,3 +95,9 @@ export type MessageResponse = {
     success: boolean;
     orders: Order[];
   };
+
+  export type AllUsersResponse = {
+    success: boolean;
+    users: User[];
+  };
+  
