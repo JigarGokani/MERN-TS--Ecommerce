@@ -12,6 +12,8 @@ import { UserReducerInitialState } from "./types/reducer-types"
 import ProtectedRoute from "./components/protected-route"
 import OrderDetails from "./pages/order-details"
 
+
+const NotFound = lazy(() => import("./pages/not-found"));
 const Search = lazy(()=>import( "./pages/search"))
 const Cart = lazy(()=>import( "./pages/cart"))
 const Home = lazy(()=>import("./pages/home"))
@@ -120,6 +122,8 @@ const App = () => {
     </Route>;
 
         
+    
+    <Route path="*" element={<NotFound />} />
 
     </Routes>
     </Suspense>
