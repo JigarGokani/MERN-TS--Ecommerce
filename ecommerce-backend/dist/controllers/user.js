@@ -25,10 +25,10 @@ export const newUser = TryCatch(async (req, res, next) => {
     });
 });
 export const getAllUser = TryCatch(async (req, res, next) => {
-    const user = await User.find({});
+    const users = await User.find({});
     res.status(200).json({
         success: true,
-        user,
+        users,
         message: "All the users fetched successfully!"
     });
 });
