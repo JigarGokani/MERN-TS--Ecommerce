@@ -68,16 +68,16 @@ export const getLatestProduct = TryCatch(async (req, res, next) => {
 });
 // Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 
 export const getAllCategories = TryCatch(async (req, res, next) => {
-    let Categories;
+    let categories;
     if (myCache.has("categories"))
-        Categories = JSON.parse(myCache.get("categories"));
+        categories = JSON.parse(myCache.get("categories"));
     else {
-        Categories = await Product.distinct("category");
-        myCache.set("categories", JSON.stringify(Categories));
+        categories = await Product.distinct("category");
+        myCache.set("categories", JSON.stringify(categories));
     }
     res.status(200).json({
         success: true,
-        Categories
+        categories
     });
 });
 // Revalidate on NEW,UPDATE,DELETE PRODUCT & on the NEW ORDER 

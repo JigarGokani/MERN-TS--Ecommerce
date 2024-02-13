@@ -92,13 +92,13 @@ export const getLatestProduct = TryCatch(async(req,res,next)=>{
 
 export const getAllCategories = TryCatch(async(req,res,next)=>{
 
-    let Categories;
+    let categories;
     if(myCache.has("categories")) 
-    Categories =  JSON.parse(myCache.get("categories") as string);
+    categories =  JSON.parse(myCache.get("categories") as string);
 
     else{
-        Categories = await Product.distinct("category")
-        myCache.set("categories",JSON.stringify(Categories))
+        categories = await Product.distinct("category")
+        myCache.set("categories",JSON.stringify(categories))
     }
 
     
@@ -106,7 +106,7 @@ export const getAllCategories = TryCatch(async(req,res,next)=>{
 
     res.status(200).json({
         success:true,
-        Categories
+        categories
     })
 })
 
