@@ -7,9 +7,9 @@
 
 .create-product-btn {
   position: fixed;
-  right: 2rem;
-  top: 2rem;
-  @include square(2.5rem);
+  right: 3rem;
+  top: 38rem;
+  @include square(4.5rem);
   @include flex(row, center, center, 0);
   border-radius: 50%;
   background-color: rgb(201, 9, 9);

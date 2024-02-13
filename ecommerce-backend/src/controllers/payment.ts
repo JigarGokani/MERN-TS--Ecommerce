@@ -4,20 +4,33 @@ import { Coupon } from "../models/coupon.js";
 import ErrorHandler from "../utils/utility-class.js";
 
 export const createPaymentIntent = TryCatch(async (req, res, next) => {
-  const { amount } = req.body;
-
-  if (!amount) return next(new ErrorHandler("Please enter amount", 400));
-
+  const { amount, shippingInfo, name } = req.body;
+  const { address, pinCode, state, country, city } = shippingInfo;
+  console.log(pinCode);
+  if (!amount)
+    return next(new ErrorHandler("Please enter both coupon and amount", 400));
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: Number(amount) * 100,
+    shipping: {
+      name: name,
+      address: {
+        line1: address,
+        postal_code: pinCode,
+        city: city,
+        state: state,
+        country: country,
+      },
+    },
+    amount: Number(amount * 100),
     currency: "inr",
+    payment_method_types: ["card"],
+    description:"Payment order created!"
   });
-
   return res.status(201).json({
     success: true,
     clientSecret: paymentIntent.client_secret,
   });
 });
+
 
 export const newCoupon = TryCatch(async (req, res, next) => {
     const { coupon, amount } = req.body;

@@ -62,6 +62,8 @@
   .cart-item {
     max-width: 1200px;
     padding: 4rem;
+    zoom:70%;
+
     @include flex(row,center, center, 3rem);
     > img {
       @include square(22rem);

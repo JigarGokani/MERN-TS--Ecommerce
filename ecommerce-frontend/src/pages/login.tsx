@@ -8,8 +8,10 @@ import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { MessageResponse } from "../types/api-types";
 import { userExist, userNotExist } from "../redux/reducer/userReducer";
 import { useDispatch } from "react-redux";
+import DummyCard from "./DummyCard"
 
 const Login = () => {
+
   const dispatch = useDispatch();
   const [gender, setGender] = useState("");
   const [date, setDate] = useState("");
@@ -57,6 +59,7 @@ const Login = () => {
   };
 
   return (
+    <>
     <div className="login">
       <main>
         <h1 className="heading">Login</h1>
@@ -84,9 +87,15 @@ const Login = () => {
           <button onClick={loginHandler}>
             <FcGoogle /> <span>Sign in with Google</span>
           </button>
+          
         </div>
       </main>
+
     </div>
+      <DummyCard/>
+    </>
+    
+
   );
 };
 
